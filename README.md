@@ -6,7 +6,7 @@ For information please check [fft wiki](https://github.com/VicoErv/fft/wiki)
       $ pkg install nodejs
       $ git clone https://github.com/dandyraka/newfft.git
       $ cd newfft
-      $ unzip node_modules.zip
+      $ npm install
 
 ## Updating
       $ git pull --force
