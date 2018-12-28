@@ -8,6 +8,9 @@ For information please check [fft wiki](https://github.com/VicoErv/fft/wiki)
       $ cd newfft
       $ npm install
 
+## Run
+      $ node index.js
+
 ## Updating
       $ git pull --force
 
