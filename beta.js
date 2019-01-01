@@ -84,12 +84,7 @@ var commands = {
     var ascii = new AsciiTable('User List');
     ascii.setHeading('Username', 'Target', 'Delay', 'DM');
     table.forEach(element => {
-	  if(element.DM == "y" || element.DM == "Y"){
-		var saveDM = "Yes";
-	  } else {
-		var saveDM = "No";
-	  }
-      ascii.addRow(element.username, element.target, element.delay, saveDM);
+	    ascii.addRow(element.username, element.target, element.delay, element.DM);
     });
 
     console.log(ascii.toString());
@@ -276,7 +271,7 @@ function add (command) {
           userInput.username = Util.responses[0];
           userInput.password = Util.responses[1];
           userInput.target   = Util.responses[2];
-		  userInput.DM       = saveDM;
+	  userInput.DM       = saveDM;
           userInput.delay    = Util.responses[4];
     
           Util.responses.length = 0;
@@ -293,7 +288,7 @@ function add (command) {
     
           console.log('Username\t'   + Colors.FgRed      + userInput.username + Colors.Reset);
           console.log('Target is\t'  + Colors.FgBlue     + userInput.target   + Colors.Reset);
-		  console.log('Auto DM\t'    + Colors.FgBlue     + saveDM             + Colors.Reset);
+	  console.log('Auto DM\t'    + Colors.FgBlue     + saveDM             + Colors.Reset);
           console.log('With delay\t' + Colors.Underscore + userInput.delay    + Colors.Reset + ' ms');
     
           if (userInput.username.length > 0 &&
