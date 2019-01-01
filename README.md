@@ -32,7 +32,8 @@ For information please check [fft wiki](https://github.com/VicoErv/fft/wiki)
         - `index of user in list table`
         - `using username of added user`
     - run `start fft program`
-        - -silent `run fft without comment`
+        - -s `silent mode, run fft without like & comment`
     - unfollow `unfollow not following back`
+        - -all `unfollow all following`
     - menu `show menu`
     - exit `exit program`
