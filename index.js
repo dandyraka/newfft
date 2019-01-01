@@ -121,10 +121,8 @@ var commands = {
     console.log(` User ${command[1]} has been removed.`);
   },
   run: (commands) => {
-    for (let i = 1; i < commands.length; i++) {
-      if (commands[i] === '-quiet') {
+	if (commands[1] == '-s') {
         fftOptions.isSilent = true;
-      }
     }
 
     if (user === null) {
@@ -185,7 +183,19 @@ var commands = {
     console.log(`${Colors.FgGreen}Success${Colors.Reset} remove all comment.`);
     askStorage();
   },
-  unfollow: unfollow,
+  unfollow: (commands) => {
+	if (commands[1] == '-all') {
+        unfollow_all();
+    } else {
+		unfollow();
+	}
+	
+	if (user === null) {
+      console.log(`Please \`${Colors.FgBlue}use ${Colors.FgRed}[user index|username]${Colors.Reset}\` before run Unfollow.`);
+      
+      return false;
+    }
+  },
   addsch: addScheduler,
   repost: repost,
   dorepost: doRepost
@@ -367,9 +377,12 @@ var gSession = null;
 
 function main () {
   loadComment(doc => comments = doc);
-
+  
   login(userInput.username, userInput.password)
     .then((session) => {
+		if (fftOptions.isSilent) {
+			console.log(`${Colors.FgRed}[ Run FFT with silent mode ]${Colors.Reset}`);
+		}
   
       return Client.Account.searchForUser(gSession, userInput.target);
     })
@@ -414,7 +427,7 @@ function main () {
             if (doc.length === 0) {
               console.log(`${current._params.username} ${Colors.FgGreen}Success Following${Colors.Reset}`);
               if (fftOptions.isSilent) {
-  
+				 
                 return ++i;
               }
 
@@ -519,6 +532,58 @@ function unfollow () {
     })
 }
 
+function unfollow_all () {
+  login(userInput.username, userInput.password)
+    .then(function (resp) {
+  
+      return resp.getAccountId()
+        .then(function (accountId) {
+          let following = new Client.Feed.AccountFollowing(gSession, accountId);
+          following.get.bind(following)()
+            .then(function (following) {
+              var i = 0;
+
+              var promiseWhile = Promise.method(function(condition, action) {
+                if (!condition()) return;
+                return new Promise((resolve) => setTimeout(function() {
+  
+                  return action().then(promiseWhile.bind(null, condition, action))
+                  resolve();
+                }, userInput.delay))
+              });
+
+              promiseWhile(function () {
+  
+                return typeof following[i] !== 'undefined';
+              }, function () {
+                let current = following[i];
+
+                return new Promise(function (resolve) {
+                  resolve();
+                }).then(function () {
+                  Client.Relationship.get(gSession, current.id)
+                    .then(function (status) {
+                      let username = current.params.username;
+					  
+					  Client.Relationship.destroy(gSession, current.id)
+                         .then(function (resp) {
+                           if (!resp.params.following) {
+                            console.log(`${Colors.Bright}${Colors.FgRed}${username}${Colors.Reset} ${Colors.FgGreen}has been unfollowed!${Colors.Reset}`);
+                           } else {
+							console.log(`${Colors.Bright}${Colors.FgRed}${username}${Colors.Reset} ${Colors.FgRed}failed to unfollow!${Colors.Reset}`);
+						   }
+						   
+                           return ++i;
+                         });
+					
+                    });
+                });
+              });
+            })
+        })
+    })
+}
+
 function addScheduler() {
   Util.ask('interval? ')
     .then(()=>Util.ask('username? '))
@@ -611,7 +676,9 @@ function dispatch() {
   console.log(`  ${Colors.Bright}${Colors.FgGreen}Program${Colors.Reset}`);
   console.log(`   use       set user for fft program`);
   console.log(`   run       start fft program`);
+  console.log(`     -s      run fft without like & comment`);
   console.log(`   unfollow  unfollow not following back`);
+  console.log(`     -all    unfollow all following`);
   console.log(`   menu      show menu`);
   console.log(`   exit      exit program`);
   console.log('');
