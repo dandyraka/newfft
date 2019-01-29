@@ -116,9 +116,11 @@ var commands = {
       return;
     }
 
-    db.remove({username: command[1]});
+	db.remove({username: command[1]});
+	fs.unlinkSync(__dirname + '/local/cookie/' + command[1] + '.cookie');
     console.log(`${Colors.FgGreen}Success${Colors.Reset}`);
     console.log(` User ${command[1]} has been removed.`);
+	console.log(` Cookie ${command[1]} has been removed.`);
   },
   run: (commands) => {
 	if (commands[1] == '-s') {
